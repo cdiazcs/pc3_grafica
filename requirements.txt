@@ -1,0 +1,9 @@
+# Entorno recomendado: Python 3.11 (usar GPU/Colab si esta disponible)
+# Resolver versiones compatibles entre TensorFlow, NumPy y el sistema.
+tensorflow>=2.16
+numpy>=1.26
+librosa>=0.10
+soundfile>=0.12
+matplotlib>=3.8
+PyYAML>=6.0
+pytest>=8.0

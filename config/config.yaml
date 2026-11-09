@@ -1,0 +1,41 @@
+project:
+  name: musicstyle-cyclegan
+  genre_a: cumbia
+  genre_b: rock
+  seed: 42
+
+paths:
+  raw_a: data/raw/genre_A
+  raw_b: data/raw/genre_B
+  train_a: data/processed/trainA
+  train_b: data/processed/trainB
+  test_a: data/processed/testA
+  test_b: data/processed/testB
+  checkpoints: checkpoints
+  generated: results/generated
+  comparisons: results/comparisons
+  metrics: results/metrics
+  plots: results/plots
+
+# Todos los ejemplos de entrenamiento: espectrogramas (128, 128, 1), float32, [-1, 1]
+audio:
+  sample_rate: 22050
+  segment_seconds: 30
+  n_fft: 2048
+  hop_length: 256
+  n_mels: 128
+  patch_frames: 128
+  test_fraction_by_song: 0.20
+
+model:
+  input_shape: [128, 128, 1]
+  output_activation: tanh
+  architecture: unet
+
+training:
+  epochs: 20
+  batch_size: 4
+  learning_rate: 0.0002
+  lambda_cycle: 10.0
+  lambda_identity: 0.0
+  checkpoint_every: 5

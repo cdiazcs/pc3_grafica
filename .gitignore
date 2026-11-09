@@ -1,0 +1,46 @@
+# Entornos y Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
+
+# Datos, artefactos y modelos (conservar .gitkeep)
+data/raw/*
+!data/raw/genre_A/
+!data/raw/genre_B/
+data/raw/genre_A/*
+!data/raw/genre_A/.gitkeep
+data/raw/genre_B/*
+!data/raw/genre_B/.gitkeep
+data/processed/**
+!data/processed/
+!data/processed/*/
+!data/processed/*/.gitkeep
+checkpoints/*
+!checkpoints/.gitkeep
+results/**
+!results/
+!results/*/
+!results/*/.gitkeep
+*.h5
+*.keras
+*.ckpt
+*.ckpt.*
+*.tfrecord
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.mp4
+*.npy
+*.npz
+
+# Logs
+logs/
+tensorboard/
