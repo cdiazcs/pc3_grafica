@@ -1,3 +1,2 @@
-# Dependencias livianas para validar el esqueleto sin instalar TensorFlow
 PyYAML>=6.0
 pytest>=8.0
