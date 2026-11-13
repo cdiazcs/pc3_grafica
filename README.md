@@ -1,84 +1,86 @@
-# PC3 - MusicStyle CycleGAN | Base comun (`main`)
+# MusicStyle-CycleGAN — PC3 Computación Gráfica
 
-Práctica Calificada 3 - Computación Gráfica, UNI, 2026-II.
-Equipo: **máximo 2 integrantes**. Exposición: **viernes 13/11/2026**, 7 minutos.
+**Universidad Nacional de Ingeniería (UNI) · 2026-II**  
+**Práctica Calificada 3 · Opción 2: CycleGAN**  
+**Repositorio:** https://github.com/cdiazcs/pc3_grafica
+
+##Integrantes :
+-Enoc Rosales 
+-Cristian Diaz
 
 ## Objetivo
 
-Adaptar CycleGAN para traducir el estilo de espectrogramas musicales entre dos géneros A y B. El material parte del notebook de clase, ubicado en `references/`, **sin afirmar que haya entrenamiento realizado**.
+Implementar una **CycleGAN** que traduzca características de espectrogramas musicales entre **cumbia (dominio A)** y **rock (dominio B)**, en ambos sentidos, sin requerir canciones emparejadas.
 
-> Este ZIP es exclusivamente el **punto de partida de `main`**: estructura, configuración, contratos y verificaciones iniciales. Los módulos de datos y entrenamiento contienen `NotImplementedError` de forma deliberada. Las funcionalidades se desarrollan en dos ramas y se fusionan directamente a `main`. No se usa `develop`.
+## Trabajo desarrollado
 
-## Organización
+- **Datos (integrante 1(Enoc)):** carga de audios, conversión a espectrogramas Mel, normalización a `[-1, 1]`, extracción de parches `(128, 128, 1)` y separación de entrenamiento/prueba por archivo musical.
+- **Modelos (integrante 2(Cristian)):** dos generadores U-Net (`G_A2B`, `G_B2A`) y dos discriminadores PatchGAN (`D_A`, `D_B`).
+- **Aprendizaje:** pérdidas adversarias, consistencia cíclica L1, pérdida de identidad opcional y cuatro optimizadores Adam.
+- **Entrenamiento:** script por épocas con métricas CSV, curvas de pérdidas y guardado/recarga de checkpoints.
+- **Resultados:** scripts independientes de inferencia (`src/infer.py`) y evaluación (`src/evaluate.py`) para traducciones y reconstrucciones cíclicas.
+- **Pruebas:** tests de estructura, configuración, datos, modelos e integración.
 
-| Responsable | Rama | Archivos a implementar |
-|---|---|---|
-| Integrante 1 | `feature/data-inference` | `src/data/preprocess.py`, `src/data/dataset.py`, `src/infer.py`, `src/evaluate.py`, `src/visualization.py`, `tests/test_data.py` |
-| Integrante 2 | `feature/model-training` | `src/models/generator.py`, `src/models/discriminator.py`, `src/models/cyclegan.py`, `src/train.py`, `tests/test_models.py` |
-| Ambos | `main` (via PR) | Integración, `tests/test_integration.py`, `presentation/`, evidencias reales |
+## Estructura principal
 
-**No cambiar sin acordarlo:** `config/config.yaml`, `src/common/config.py` y `docs/CONTRATOS.md`. Cualquier cambio de interfaz debe integrarse primero mediante PR específico.
-
-## Comenzar desde el ZIP
-
-1. Extraer `PC3-CycleGAN-BASE-MAIN.zip` y abrir la carpeta raíz.
-2. Crear repositorio Git local sobre la base:
-
-```bash
-git init -b main
-git add .
-git commit -m "chore: initialize PC3 CycleGAN project base"
-git remote add origin URL_DEL_REPOSITORIO_GITHUB
-git push -u origin main
+```text
+config/config.yaml           # Parámetros compartidos
+src/data/                    # Preprocesamiento y dataset
+src/models/                  # Generadores, discriminadores y CycleGAN
+src/train.py                 # Entrenamiento
+src/infer.py                 # Traducción de espectrogramas
+src/evaluate.py              # Evaluación
+src/visualization.py         # Visualizaciones
+tests/                       # Pruebas
+data/raw/                    # Audios por género
+data/processed/              # Espectrogramas .npy
+checkpoints/                 # Pesos entrenados
+results/                     # Métricas, gráficas y traducciones
+presentation/                # Presentación de la PC3
 ```
 
-3. Cada integrante clona ese repositorio y crea su rama desde `main`:
+## Entorno y ejecución
+
+Entorno utilizado: **Python 3.12.16** y **TensorFlow 2.16.2** en Ubuntu.
 
 ```bash
-git clone URL_DEL_REPOSITORIO_GITHUB
-cd PC3-CycleGAN-BASE-MAIN
-git switch -c feature/data-inference        # integrante 1
-# o: git switch -c feature/model-training  # integrante 2
-git push -u origin NOMBRE_DE_MI_RAMA
-```
+# Desde la raíz del repositorio
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 
-4. Crear entorno Python 3.11 y ejecutar comprobaciones de **base**:
-
-```bash
-python -m venv .venv
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-# Linux/macOS: source .venv/bin/activate
-pip install -r requirements-dev.txt
-python scripts/check_structure.py
-python -m pytest tests/test_config.py tests/test_structure.py -q
-```
-
-5. Para ejecutar el proyecto completo cuando esté implementado:
-
-```bash
-pip install -r requirements.txt
+# Preparar audios y espectrogramas
 python -m src.data.preprocess --config config/config.yaml
+
+# Ejecutar pruebas
+python -m pytest tests/ -q
+
+# Entrenar (requiere archivos .npy preparados)
 python -m src.train --config config/config.yaml
-python -m src.infer --config config/config.yaml --direction A2B --input ruta/espectrograma.npy
+
+# Inferir un parche individual (128,128,1)
+python -m src.infer --config config/config.yaml \
+  --direction A2B --input ruta/parche.npy \
+  --checkpoint ruta/G_A2B.weights.h5
+
+# Evaluar con los checkpoints indicados en la configuración
 python -m src.evaluate --config config/config.yaml
 ```
 
-Estos últimos comandos **no funcionan hasta que los integrantes implementen los TODO**; esto es intencional.
+## Evidencia de avance (13/11/2026)
 
-## Contratos y documentación
+- La auditoría reportó **17 pruebas de solo lectura aprobadas**.
+- Se ejecutó una **prueba real de entrenamiento de 1 época y 19 batches** con espectrogramas musicales, usando batch size 1.
+- Las pérdidas de la época se registraron en `results/metrics/prueba_cpu/training_log.csv`.
+- Se guardaron pesos de ambos generadores en `checkpoints/prueba_cpu/`, además de checkpoints por época.
 
-- `docs/CONTRATOS.md`: formatos, firmas y dependencias entre integrantes.
-- `docs/GIT_WORKFLOW.md`: trabajo por ramas, sincronización, PR y merge sin `develop`.
-- `docs/RUBRICA_Y_EVIDENCIAS.md`: lista de evidencias para 7 + 5 + 8 puntos.
-- `docs/ADAPTACION_NOTEBOOK.md`: guía para trasladar el notebook del profesor a espectrogramas.
+## Equipo y Git
 
-## Dataset y salidas
+| Responsable | Rama de trabajo | Módulos |
+|---|---|---|
+| Integrante 1 | `feature/data-inference` | Datos, inferencia, evaluación y visualización |
+| Integrante 2 | `feature/model-training` | Generadores, discriminadores y entrenamiento |
 
-`data/raw/genre_A/` y `genre_B/`: audios de referencia autorizados; la evaluación debe contener fragmentos **de 30 segundos** para ambos géneros.
-`data/processed/trainA`, `trainB`, `testA`, `testB`: matrices `.npy` preprocesadas. Separar **por canción** antes de generar ventanas para impedir fuga de datos entre train y test.
+Los cambios se integran directamente a **`main` mediante Pull Requests**. No se utiliza `develop`.
 
-`checkpoints/` y `results/` se generan durante entrenamiento e inferencia, pero no vienen con pesos ni resultados ficticios. Mantener checkpoints importantes en almacenamiento compartido y documentar el procedimiento de recuperación.
 
-## Integración
-
-Todos los cambios se integran **directamente a `main` mediante Pull Request**, tras revisión y pruebas. No existe rama `develop`. Ver `docs/GIT_WORKFLOW.md`.
+**Referencia académica:** notebook de CycleGAN proporcionado en clase, conservado en `references/`.

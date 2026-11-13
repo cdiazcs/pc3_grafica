@@ -1,4 +1,4 @@
-"""Verifica el esqueleto base sin TensorFlow ni archivos de audio."""
+
 from pathlib import Path
 import sys
 

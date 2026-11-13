@@ -1,4 +1,4 @@
-"""Pruebas del contrato de configuracion (corren aun sin TensorFlow)."""
+
 from pathlib import Path
 from src.common.config import load_config
 
